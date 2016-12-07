@@ -28,6 +28,7 @@ Plugin 'tpope/vim-surround'
 Plugin 'tpope/vim-fugitive'
 Plugin 'junegunn/goyo.vim'
 Plugin 'nelsyeung/twig.vim'
+Plugin 'christoomey/vim-tmux-navigator'
 
 
 " All of your Plugins must be added before the following line
@@ -78,7 +79,6 @@ set tabstop=4
 
 
 set relativenumber
-set term=xterm-256color
 
 set antialias
 set cursorline " Highlight current line
@@ -107,9 +107,6 @@ xnoremap p "_dP
 noremap <S-Tab>	:tabprevious<CR>
 noremap <Tab>   :tabnext<CR>
 noremap <C-t>	:tabedit 
-
-nnoremap <C-h> <C-w><Left> 
-nnoremap <C-l> <C-w><Right> 
 
 vnoremap <S-Tab>	<
 vnoremap <Tab>	>
@@ -376,13 +373,14 @@ nnoremap <Leader>cd :cd %:p:h <CR>
 
 
 "Move line up or down
-nnoremap <C-k> :m .-2<CR>==
-nnoremap <C-j> :m .+1<CR>==
-
+"nnoremap <C-k> :m .-2<CR>==
+"nnoremap <C-j> :m .+1<CR>==
+"
 
 autocmd! BufNewFile,BufRead *.js,*.json set filetype=javascript
 autocmd! BufNewFile,BufRead *.html set filetype=html
 autocmd! BufNewFile,BufRead *.rb set filetype=ruby
+
 
 
 let g:jsx_ext_required = 0
@@ -391,7 +389,36 @@ nnoremap <leader>m  :<c-u><c-r><c-r>='let @'. v:register .' = '. string(getreg(v
 
 inoremap cl<Tab> console.log()<Esc>i
 
+set t_Co=256
+
+
 " patch vim fugitive
 autocmd QuickFixCmdPost *grep* cwindow
 
 colorscheme Tomorrow-Night
+
+if exists('$TMUX')
+  function! TmuxOrSplitSwitch(wincmd, tmuxdir)
+    let previous_winnr = winnr()
+    silent! execute "wincmd " . a:wincmd
+    if previous_winnr == winnr()
+      call system("tmux select-pane -" . a:tmuxdir)
+      redraw!
+    endif
+  endfunction
+
+  let previous_title = substitute(system("tmux display-message -p '#{pane_title}'"), '\n', '', '')
+  let &t_ti = "\<Esc>]2;vim\<Esc>\\" . &t_ti
+  let &t_te = "\<Esc>]2;". previous_title . "\<Esc>\\" . &t_te
+
+  nnoremap <silent> <C-h> :call TmuxOrSplitSwitch('h', 'L')<cr>
+  nnoremap <silent> <C-j> :call TmuxOrSplitSwitch('j', 'D')<cr>
+  nnoremap <silent> <C-k> :call TmuxOrSplitSwitch('k', 'U')<cr>
+  nnoremap <silent> <C-l> :call TmuxOrSplitSwitch('l', 'R')<cr>
+else
+  map <C-h> <C-w>h
+  map <C-j> <C-w>j
+  map <C-k> <C-w>k
+  map <C-l> <C-w>l
+endif
+
