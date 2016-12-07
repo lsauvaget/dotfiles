@@ -1,0 +1,36 @@
+export PATH="/Library/Frameworks/Python.framework/Versions/2.7/bin:${PATH}"
+
+debrid(){
+query=$1
+encoded=$(php -r "echo rawurlencode('$query');")
+url="https://www.alldebrid.fr/service.php?link=$encoded&nb=0&json=true"
+
+debride=$(curl -A  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.152 Safari/537.36" --cookie "uid=09d3dcb8b61c1a4fbd30865c; lang=fr; __cfduid=d91ed8c986920fbd050e3fc248994c7281430579156" $url | tr -d {} | sed -e 's/\\//g' | cut -d"\"" -f4) 
+cd ~/Downloads/
+aria2c -x6 $debride
+}
+alias debrideur=debrid
+
+# MacPorts Installer addition on 2015-05-29_at_22:31:20: adding an appropriate PATH variable for use with MacPorts.
+export PATH="/opt/local/bin:/opt/local/sbin:$PATH"
+# Finished adapting your PATH environment variable for use with MacPorts.
+
+
+alias l="ls -alhG"
+
+# une commande fréquemment utilisée
+alias ll='ls -l'
+# Remonter d'un dossier et ls
+alias tmux="TERM=screen-256color-bce tmux"
+alias dev="cd ~/Devs/"
+alias dl="cd ~/Downloads; aria2c -x6 $1"
+alias vps="ssh root@vps176126.ovh.net"
+alias finder="open -a Finder ./"
+
+alias envdocker="eval $(docker-machine env default)"
+
+alias restartdocker="docker-machine restart default ; docker-machine env default; eval $(docker-machine env default)"
+alias startdocker="docker-machine start default ; docker-machine env default; eval $(docker-machine env default)"
+
+export GOPATH=/Users/leosauvaget/Devs/go
+export PATH=$PATH:/usr/local/go/bin
