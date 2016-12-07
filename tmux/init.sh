@@ -6,5 +6,6 @@ ln -s $DOTFILES/.tmux.conf $HOME
 ln -s $DOTFILES/.tmuxcolors-dark.conf $HOME
 ln -s $DOTFILES/.tmux-osx.conf $HOME
 brew install reattach-to-user-namespace
+tmux source-file ~/.tmux.conf
 
 
