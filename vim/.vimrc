@@ -29,6 +29,9 @@ Plugin 'tpope/vim-fugitive'
 Plugin 'junegunn/goyo.vim'
 Plugin 'nelsyeung/twig.vim'
 Plugin 'christoomey/vim-tmux-navigator'
+Plugin 'claco/jasmine.vim'
+
+set clipboard=unnamed
 
 
 " All of your Plugins must be added before the following line
@@ -78,7 +81,6 @@ set softtabstop=4
 set tabstop=4
 
 
-set relativenumber
 
 set antialias
 set cursorline " Highlight current line
