@@ -30,6 +30,7 @@ Plugin 'junegunn/goyo.vim'
 Plugin 'nelsyeung/twig.vim'
 Plugin 'christoomey/vim-tmux-navigator'
 Plugin 'claco/jasmine.vim'
+Plugin 'tpope/vim-obsession'
 
 set clipboard=unnamed
 
@@ -79,7 +80,6 @@ set expandtab
 set shiftwidth=4
 set softtabstop=4
 set tabstop=4
-
 
 
 set antialias
