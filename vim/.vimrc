@@ -26,13 +26,18 @@ Plugin 'scrooloose/syntastic'
 Plugin 'Townk/vim-autoclose'
 Plugin 'tpope/vim-surround'
 Plugin 'tpope/vim-fugitive'
-Plugin 'junegunn/goyo.vim'
 Plugin 'nelsyeung/twig.vim'
 Plugin 'christoomey/vim-tmux-navigator'
-Plugin 'claco/jasmine.vim'
 Plugin 'tpope/vim-obsession'
+Plugin 'moll/vim-node'
+Plugin 'tpope/vim-repeat'
+Plugin 'duggiefresh/vim-easydir'
 
 set clipboard=unnamed
+
+" fix
+if !exists("b:undo_ftplugin") | let b:undo_ftplugin = '#!' | endif
+let b:undo_ftplugin .= ' | setlocal iskeyword< suffixesadd<'
 
 
 " All of your Plugins must be added before the following line
@@ -400,6 +405,7 @@ inoremap cl<Tab> console.log()<Esc>i
 set t_Co=256
 
 
+
 " patch vim fugitive
 autocmd QuickFixCmdPost *grep* cwindow
 
@@ -438,3 +444,19 @@ let g:netrw_altv=1          " open splits to the right
 let g:netrw_liststyle=3     " tree view
 let g:netrw_list_hide=netrw_gitignore#Hide()
 let g:netrw_list_hide.=',\(^\|\s\s\)\zs\.\S\+'
+
+" angular
+
+let g:angular_source_directory = 'src/app'
+let g:angular_test_directory = 'test/specs'
+
+
+nnoremap <leader>f :Ack ""<left>
+
+
+autocmd User Node
+  \ if &filetype == "javascript" |
+  \   nmap <buffer> <C-w>f <Plug>NodeVSplitGotoFile |
+  \   nmap <buffer> <C-w><C-f> <Plug>NodeVSplitGotoFile |
+  \ endif
+
