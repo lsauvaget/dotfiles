@@ -11,27 +11,33 @@ call vundle#begin()
 Plugin 'VundleVim/Vundle.vim'
 Plugin 'easymotion/vim-easymotion'
 Plugin 'chriskempson/vim-tomorrow-theme'
-Plugin 'sheerun/vim-polyglot'
 Plugin  'kien/ctrlp.vim'
 Plugin 'mileszs/ack.vim'
 Plugin 'vim-scripts/LustyExplorer'
 Plugin 'mattn/emmet-vim'
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
-Plugin 'Shougo/neocomplete.vim'
-Plugin 'Shougo/neosnippet.vim'
-Plugin 'honza/vim-snippets'
+
+Plugin 'Shougo/deoplete.nvim'
+Plugin 'roxma/nvim-yarp'
+Plugin 'roxma/vim-hug-neovim-rpc'
+Plugin 'moll/vim-node'
+Plugin 'sheerun/vim-polyglot'
+
 Plugin 'scrooloose/nerdcommenter'
 Plugin 'scrooloose/syntastic'
 Plugin 'Townk/vim-autoclose'
 Plugin 'tpope/vim-surround'
 Plugin 'tpope/vim-fugitive'
-Plugin 'nelsyeung/twig.vim'
 Plugin 'christoomey/vim-tmux-navigator'
 Plugin 'tpope/vim-obsession'
-Plugin 'moll/vim-node'
 Plugin 'tpope/vim-repeat'
 Plugin 'duggiefresh/vim-easydir'
+Plugin 'fatih/vim-go.git'
+"Plugin 'Valloric/YouCompleteMe'
+Plugin 'posva/vim-vue'
+Plugin 'prettier/vim-prettier'
+
 
 set clipboard=unnamed
 
@@ -82,9 +88,9 @@ set backspace=indent,eol,start
 
 " Tab control
 set expandtab
-set shiftwidth=4
-set softtabstop=4
-set tabstop=4
+set shiftwidth=2
+set softtabstop=2
+set tabstop=2
 
 
 set antialias
@@ -94,7 +100,7 @@ set noswapfile
 set nofoldenable " don't fold by default
 set so=7 " set 7 lines to the cursors - when moving vertical
 set gdefault " Toggle g option by default on substition
-set history=256 
+set history=256
 set mouse=a
 set ttyfast " faster redrawing
 set wrapscan
@@ -113,7 +119,7 @@ xnoremap p "_dP
 
 noremap <S-Tab>	:tabprevious<CR>
 noremap <Tab>   :tabnext<CR>
-noremap <C-t>	:tabedit 
+noremap <C-t>	:tabedit
 
 vnoremap <S-Tab>	<
 vnoremap <Tab>	>
@@ -137,15 +143,10 @@ nnoremap <leader><space> :%s/\s\+$<cr>
 " clear highlighted search
 noremap <F6> :set hlsearch! hlsearch?<cr>
 
-"Ctrl+c in visual mode sends selection to clipboard 
-vnoremap <C-c> "+y 
+"Ctrl+c in visual mode sends selection to clipboard
+vnoremap <C-c> "+y
 inoremap <C-o> <esc>o
 inoremap <C-O> <esc>O
-
-nnoremap <C-G> :Goyo<cr>
-let g:goyo_width = '90%'
-let g:goyo_height = '90%'
-
 
 for i in range(97,122)
     let c = nr2char(i)
@@ -156,97 +157,12 @@ endfor
 noremap <up> <C-b>
 noremap <down> <C-f>
 
-"
-"-------------Neo Complete
-"
-
-"Note: This option must set it in .vimrc(_vimrc).  NOT IN .gvimrc(_gvimrc)!
-" Disable AutoComplPop.
-let g:acp_enableAtStartup = 0
-" Use neocomplete.
-let g:neocomplete#enable_at_startup = 1
-" Use smartcase.
-let g:neocomplete#enable_smart_case = 1
-" Set minimum syntax keyword length.
-let g:neocomplete#sources#syntax#min_keyword_length = 3
-let g:neocomplete#lock_buffer_name_pattern = '\*ku\*'
-
-" Define dictionary.
-let g:neocomplete#sources#dictionary#dictionaries = {
-            \ 'default' : '',
-            \ 'vimshell' : $HOME.'/.vimshell_hist',
-            \ 'scheme' : $HOME.'/.gosh_completions'
-            \ }
-
-" Define keyword.
-if !exists('g:neocomplete#keyword_patterns')
-    let g:neocomplete#keyword_patterns = {}
-endif
-let g:neocomplete#keyword_patterns['default'] = '\h\w*'
-" Plugin key-mappings.
-inoremap <expr><C-g>     neocomplete#undo_completion()
-inoremap <expr><C-l>     neocomplete#complete_common_string()
-
-
-" Enable omni completion.
-autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
-autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-
-" Enable heavy omni completion.
-if !exists('g:neocomplete#sources#omni#input_patterns')
-    let g:neocomplete#sources#omni#input_patterns = {}
-endif
-
-
-let g:neocomplete#keyword_patterns['default'] = '\h\w*'
-
-" Recommended key-mappings.
-" <CR>: close popup and save indent.
-inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
-function! s:my_cr_function()
-  return neocomplete#close_popup() . "\<CR>"
-  " For no inserting <CR> key.
-  "return pumvisible() ? neocomplete#close_popup() : "\<CR>"
-endfunction
-" <TAB>: completion.
-inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
-" <C-h>, <BS>: close popup and delete backword char.
-inoremap <expr><C-h> neocomplete#smart_close_popup()."\<C-h>"
-inoremap <expr><BS> neocomplete#smart_close_popup()."\<C-h>"
-inoremap <expr><C-y>  neocomplete#close_popup()
-inoremap <expr><C-e>  neocomplete#cancel_popup()
-
-" Plugin key-mappings.
-imap <C-k>     <Plug>(neosnippet_expand_or_jump)
-smap <C-k>     <Plug>(neosnippet_expand_or_jump)
-xmap <C-k>     <Plug>(neosnippet_expand_target)
-
-
-
-
 
 
 " For conceal markers.
 if has('conceal')
     set conceallevel=2 concealcursor=niv
 endif
-
-
-" Enable snipMate compatibility feature.
-let g:neosnippet#enable_snipmate_compatibility = 1
-
-" Tell Neosnippet about the other snippets
-let g:neosnippet#snippets_directory='~/.vim/bundle/vim-snippets/snippets'
-
-let g:neosnippet#disable_runtime_snippets = {
-    \   '_' : 1,
-    \ }
-
-
-
 
 
 
@@ -352,7 +268,7 @@ let g:EasyMotion_smartcase = 1
 "
 " " JK motions: Line motions
 noremap <space>j <Plug>(easymotion-j)
-noremap <space>k <Plug>(easymotion-k) 
+noremap <space>k <Plug>(easymotion-k)
 
 
 
@@ -383,12 +299,6 @@ let g:vim_markdown_folding_disabled=1
 " Change the current working directory to the directory that the current file
 " you are editing is in.
 nnoremap <Leader>cd :cd %:p:h <CR>
-
-
-"Move line up or down
-"nnoremap <C-k> :m .-2<CR>==
-"nnoremap <C-j> :m .+1<CR>==
-"
 
 autocmd! BufNewFile,BufRead *.js,*.json set filetype=javascript
 autocmd! BufNewFile,BufRead *.html set filetype=html
@@ -445,12 +355,6 @@ let g:netrw_liststyle=3     " tree view
 let g:netrw_list_hide=netrw_gitignore#Hide()
 let g:netrw_list_hide.=',\(^\|\s\s\)\zs\.\S\+'
 
-" angular
-
-let g:angular_source_directory = 'src/app'
-let g:angular_test_directory = 'test/specs'
-
-
 nnoremap <leader>f :Ack ""<left>
 
 
@@ -460,3 +364,34 @@ autocmd User Node
   \   nmap <buffer> <C-w><C-f> <Plug>NodeVSplitGotoFile |
   \ endif
 
+" deoplete options
+let g:deoplete#enable_at_startup = 1
+let g:deoplete#enable_smart_case = 1
+
+" disable autocomplete by default
+let b:deoplete_disable_auto_complete=1
+let g:deoplete_disable_auto_complete=1
+call deoplete#custom#buffer_option('auto_complete', v:false)
+
+if !exists('g:deoplete#omni#input_patterns')
+    let g:deoplete#omni#input_patterns = {}
+endif
+
+" Disable the candidates in Comment/String syntaxes.
+call deoplete#custom#source('_',
+            \ 'disabled_syntaxes', ['Comment', 'String'])
+
+autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
+
+" set sources
+let g:deoplete#sources = {}
+let g:deoplete#sources.cpp = ['LanguageClient']
+let g:deoplete#sources.python = ['LanguageClient']
+let g:deoplete#sources.python3 = ['LanguageClient']
+let g:deoplete#sources.rust = ['LanguageClient']
+let g:deoplete#sources.c = ['LanguageClient']
+
+au FileType go set noexpandtab
+au FileType go set shiftwidth=4
+au FileType go set softtabstop=4
+au FileType go set tabstop=4et g:deoplete#sources.vim = ['vim']
