@@ -26,7 +26,6 @@ Plug 'junegunn/fzf.vim'
 Plug 'mhinz/vim-signify'
 Plug 'mileszs/ack.vim'
 Plug 'scrooloose/nerdcommenter'
-Plug 'terryma/vim-multiple-cursors'
 Plug 'tpope/vim-fugitive'
 Plug 'tpope/vim-surround'
 Plug 'easymotion/vim-easymotion'
@@ -43,6 +42,7 @@ Plug 'pangloss/vim-javascript'                 " JavaScript syntax highlighting
 Plug 'plasticboy/vim-markdown'                 " Markdown syntax highlighting
 Plug 'zchee/deoplete-go', { 'do': 'make'}      " Go auto completion
 Plug 'zchee/deoplete-jedi'                     " Go auto completion
+Plug 'carlitux/deoplete-ternjs', { 'do': 'npm install -g tern' }
 
 Plug 'vim-scripts/LustyExplorer'
 Plug 'duggiefresh/vim-easydir'
@@ -54,8 +54,10 @@ Plug 'mattn/emmet-vim'
 Plug 'jiangmiao/auto-pairs'
 Plug 'w0rp/ale'
 
+
 " Colorschemes
 Plug 'chriskempson/vim-tomorrow-theme'
+
 
 call plug#end()
 
@@ -129,9 +131,6 @@ let mapleader = ','
 " Remove trailing white spaces on save
 autocmd BufWritePre * :%s/\s\+$//e
 
-" relative completion path (important)
-autocmd BufEnter * silent! lcd %:p:h
-
 "----------------------------------------------
 " Colors
 "----------------------------------------------
@@ -151,8 +150,8 @@ highlight Search guibg=DeepPink4 guifg=White ctermbg=53 ctermfg=White
 set incsearch                     " move to match as you type the search query
 set hlsearch                      " disable search result highlighting
 
-" Clear search highlights
-map <leader>c :nohlsearch<cr>
+"close quick view
+nnoremap <leader>c :cclose<cr>
 
 " These mappings will make it so that going to the next one in a search will
 " center on the line it's found in.
@@ -200,6 +199,7 @@ nnoremap <leader>h :split<cr>
 " Closing splits
 nnoremap <leader>q :close<cr>
 
+
 "----------------------------------------------
 " Plugin: Shougo/deoplete.nvim
 "----------------------------------------------
@@ -220,7 +220,11 @@ endfunction
 "
 "----------------Emmet--------
 "
-let g:user_emmet_mode='a'    " enable all function in all mode.
+let g:user_emmet_settings = {
+  \  'javascript.jsx' : {
+    \      'extends' : 'jsx',
+    \  },
+  \}
 
 "----------------------------------------------
 " Plugin: bling/vim-airline
@@ -313,18 +317,25 @@ let g:EasyMotion_startofline = 0 " keep cursor column when JK motion "
 "----------------------------------------------
 " Plugin: 'junegunn/fzf.vim'
 "----------------------------------------------
-nnoremap <c-p> :FZF<cr>
-nnoremap <c-p>b :Buffers<cr>
-nnoremap <c-p>s :Ag<cr>
-nnoremap <c-p>h :History<cr>
-nmap <leader><tab> <plug>(fzf-maps-n)
 
-imap <c-x><c-k> <plug>(fzf-complete-word)
-imap <c-x><c-f> <plug>(fzf-complete-path)
-imap <c-x><c-j> <plug>(fzf-complete-file-ag)
-imap <c-x><c-l> <plug>(fzf-complete-line)
+command! FZFGitStatus call fzf#run({'source': "git status --porcelain \| sed 's:^...::'", 'sink': 'e'})
+
+nnoremap <c-p> :Files<cr>
+nnoremap ; :Buffers<cr>
+nnoremap <c-p><c-h> :History<cr>
+nnoremap <c-p><c-s> :FZFGitStatus<cr>
+
+imap <c-x><c-p> <plug>(fzf-complete-path)
+
+"imap <c-x><c-k> <plug>(fzf-complete-word)
+"imap <c-x><c-j> <plug>(fzf-complete-file-ag)
+"imap <c-x><c-l> <plug>(fzf-complete-line)
 "
 let $FZF_DEFAULT_COMMAND = 'ag -g ""'
+
+inoremap <expr> <c-x><c-f> fzf#vim#complete#path(
+    \ "find . -path '*/\.*' -prune -o -print \| sed '1d;s:^..::'",
+    \ fzf#wrap({'dir': expand('%:p:h')}))
 
 "----------------------------------------------
 " Plugin: plasticboy/vim-markdown
@@ -452,30 +463,6 @@ let g:go_metalinter_enabled = [
 
 " Set whether the JSON tags should be snakecase or camelcase.
 let g:go_addtags_transform = "snakecase"
-
-" neomake configuration for Go.
-let g:neomake_go_enabled_makers = [ 'go', 'gometalinter' ]
-let g:neomake_go_gometalinter_maker = {
-  \ 'args': [
-  \   '--tests',
-  \   '--enable-gc',
-  \   '--concurrency=3',
-  \   '--fast',
-  \   '-D', 'aligncheck',
-  \   '-D', 'dupl',
-  \   '-D', 'gocyclo',
-  \   '-D', 'gotype',
-  \   '-E', 'misspell',
-  \   '-E', 'unused',
-  \   '%:p:h',
-  \ ],
-  \ 'append_file': 0,
-  \ 'errorformat':
-  \   '%E%f:%l:%c:%trror: %m,' .
-  \   '%W%f:%l:%c:%tarning: %m,' .
-  \   '%E%f:%l::%trror: %m,' .
-  \   '%W%f:%l::%tarning: %m'
-  \ }
 
 "----------------------------------------------
 " Language: Bash
@@ -657,10 +644,39 @@ set wildcharm=<C-Z>
 " Plugin: w0rp/ale
 "----------------------------------------------
 
-" Set this setting in vimrc if you want to fix files automatically on save.
-" This is off by default.
-let g:ale_fix_on_save = 1
-" Enable completion where available.
-let g:ale_completion_enabled = 1
-" Set this. Airline will handle the rest.
-let g:airline#extensions#ale#enabled = 1
+let g:ale_sign_error = '!' " Less aggressive than the default '>>'
+let g:ale_sign_warning = '?'
+let g:ale_lint_on_enter = 0 " Less distracting when opening a new file
+let g:ale_linters = {'javascript': ['eslint', 'prettier']}
+let g:ale_linters_explicit = 1
+
+
+"----------------------------------------------
+
+
+"----------------------------------------------
+" Plugin: prettier
+"----------------------------------------------
+
+let g:prettier#autoformat = 0
+autocmd BufWritePre *.js,*.jsx,*.mjs,*.ts,*.tsx,*.css,*.less,*.scss,*.json,*.graphql,*.md,*.vue PrettierAsync
+
+
+
+"Add extra filetypes
+let g:deoplete#sources#ternjs#filetypes = [
+                \ 'jsx',
+                \ 'vue',
+                \ ]
+
+
+let g:netrw_banner = 0
+let g:netrw_liststyle = 3
+let g:netrw_browse_split = 4
+let g:netrw_altv = 1
+let g:netrw_winsize = 25
+augroup ProjectDrawer
+  autocmd!
+  autocmd VimEnter * :Vexplore
+augroup END
+
